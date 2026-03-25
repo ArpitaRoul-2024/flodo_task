@@ -19,7 +19,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   late final TextEditingController _descCtrl;
   late DateTime _dueDate;
   late TaskStatus _status;
-  int? _blockedById;
+  String? _blockedById;
   bool _initialized = false;
 
   bool get _isEditing => widget.existingTask != null;
@@ -199,7 +199,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
             // ── Blocked By ─────────────────────────────────────────────
             _Label('Blocked By (optional)'),
             const Gap(6),
-            DropdownButtonFormField<int?>(
+            DropdownButtonFormField< String?>(
               value: _blockedById,
               decoration: const InputDecoration(hintText: 'None'),
               items: [

@@ -227,7 +227,7 @@ class _StatusChip extends StatelessWidget {
 // ─── Delete Button ────────────────────────────────────────────────────────────
 
 class _DeleteButton extends ConsumerWidget {
-  final int taskId;
+  final String taskId; // ← int se String
   const _DeleteButton({required this.taskId});
 
   @override
@@ -235,10 +235,8 @@ class _DeleteButton extends ConsumerWidget {
     return IconButton(
       iconSize: 18,
       visualDensity: VisualDensity.compact,
-      icon: Icon(
-        Icons.delete_outline,
-        color: Theme.of(context).colorScheme.error.withOpacity(0.7),
-      ),
+      icon: Icon(Icons.delete_outline,
+          color: Theme.of(context).colorScheme.error.withOpacity(0.7)),
       onPressed: () async {
         final confirmed = await showDialog<bool>(
           context: context,
@@ -247,13 +245,11 @@ class _DeleteButton extends ConsumerWidget {
             content: const Text('This action cannot be undone.'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel')),
               FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Delete'),
-              ),
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete')),
             ],
           ),
         );

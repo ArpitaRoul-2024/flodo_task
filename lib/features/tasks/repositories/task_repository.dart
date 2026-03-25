@@ -1,45 +1,56 @@
-import 'package:isar/isar.dart';
-import '../../../core/db/isar_service.dart';
+import 'dart:async';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uuid/uuid.dart';
+import '../../../core/db/hive_service.dart';
 import '../models/task.dart';
 
 class TaskRepository {
-  Isar get _db => IsarService.db;
+  Box<Task> get _box => HiveService.tasksBox;
 
-  /// Watch all tasks as a live stream
-  Stream<List<Task>> watchAll() {
-    return _db.tasks.where().sortBySortOrder().watch(fireImmediately: true);
+  List<Task> _getSorted() {
+    final tasks = _box.values.toList();
+    tasks.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return tasks;
   }
 
-  Future<List<Task>> getAll() => _db.tasks.where().sortBySortOrder().findAll();
+  Stream<List<Task>> watchAll() {
+    final controller = StreamController<List<Task>>.broadcast();
+    controller.add(_getSorted());
+    final sub = _box.watch().listen((_) => controller.add(_getSorted()));
+    controller.onCancel = sub.cancel;
+    return controller.stream;
+  }
 
-  Future<Task?> getById(Id id) => _db.tasks.get(id);
+  List<Task> getAll() => _getSorted();
 
-  /// Create with simulated 2-second network delay
+  Task? getById(String id) {
+    try {
+      return _box.values.firstWhere((t) => t.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> create(Task task) async {
     await Future.delayed(const Duration(seconds: 2));
-    await _db.writeTxn(() async {
-      // Assign sort order as max+1
-      final count = await _db.tasks.count();
-      task.sortOrder = count;
-      await _db.tasks.put(task);
-    });
+    task.id = const Uuid().v4();
+    task.sortOrder = _box.length;
+    await _box.put(task.id, task);
   }
 
-  /// Update with simulated 2-second network delay
   Future<void> update(Task task) async {
     await Future.delayed(const Duration(seconds: 2));
-    await _db.writeTxn(() => _db.tasks.put(task));
+    await _box.put(task.id, task);
   }
 
-  Future<void> delete(Id id) async {
-    await _db.writeTxn(() => _db.tasks.delete(id));
+  Future<void> delete(String id) async {
+    await _box.delete(id);
   }
 
-  /// Update status only (no delay — used for quick status toggles)
-  Future<void> updateStatus(Id id, TaskStatus status) async {
-    final task = await _db.tasks.get(id);
+  Future<void> updateStatus(String id, TaskStatus status) async {
+    final task = getById(id);
     if (task == null) return;
     task.status = status;
-    await _db.writeTxn(() => _db.tasks.put(task));
+    await _box.put(id, task);
   }
 }

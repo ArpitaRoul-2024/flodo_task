@@ -1,9 +1,18 @@
-import 'package:isar/isar.dart';
+import 'package:hive/hive.dart';
 
 part 'task.g.dart';
 
-/// Enum for task status
-enum TaskStatus { todo, inProgress, done }
+@HiveType(typeId: 0)
+enum TaskStatus {
+  @HiveField(0)
+  todo,
+
+  @HiveField(1)
+  inProgress,
+
+  @HiveField(2)
+  done,
+}
 
 extension TaskStatusLabel on TaskStatus {
   String get label {
@@ -22,21 +31,27 @@ extension TaskStatusLabel on TaskStatus {
   }
 }
 
-@collection
-class Task {
-  Id id = Isar.autoIncrement;
+@HiveType(typeId: 1)
+class Task extends HiveObject {
+  @HiveField(0)
+  late String id;
 
+  @HiveField(1)
   late String title;
+
+  @HiveField(2)
   late String description;
+
+  @HiveField(3)
   late DateTime dueDate;
 
-  @Enumerated(EnumType.name)
+  @HiveField(4)
   late TaskStatus status;
 
-  /// ID of the task that must be completed before this one (optional)
-  int? blockedById;
+  @HiveField(5)
+  String? blockedById;
 
-  /// Display order for drag-and-drop (future-proof)
+  @HiveField(6)
   late int sortOrder;
 
   Task();
