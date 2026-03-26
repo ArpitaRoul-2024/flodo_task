@@ -36,10 +36,17 @@ final statusFilterProvider = StateProvider<TaskStatus?>((_) => null);
 
 // ─── Filtered Tasks ───────────────────────────────────────────────────────────
 
+// ─── Filtered Tasks ───────────────────────────────────────────────────────────
+
 final filteredTasksProvider = Provider<AsyncValue<List<Task>>>((ref) {
   final allAsync = ref.watch(tasksStreamProvider);
   final query = ref.watch(debouncedSearchProvider).trim().toLowerCase();
   final statusFilter = ref.watch(statusFilterProvider);
+
+  // Loading ke waqt empty list dikhao — loader nahi
+  if (allAsync is AsyncLoading) {
+    return const AsyncData([]);
+  }
 
   return allAsync.whenData((tasks) {
     return tasks.where((t) {
@@ -51,7 +58,6 @@ final filteredTasksProvider = Provider<AsyncValue<List<Task>>>((ref) {
     }).toList();
   });
 });
-
 // ─── Draft Persistence ────────────────────────────────────────────────────────
 
 const _draftTitleKey = 'draft_title';
