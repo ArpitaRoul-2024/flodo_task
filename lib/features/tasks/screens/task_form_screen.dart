@@ -34,9 +34,8 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     'Blocked by?',
   ];
 
-  // Validation flags
-  bool _titleValid = false;
-  bool _descValid = true; // description is optional
+   bool _titleValid = false;
+  bool _descValid = true;
   bool _dateSelected = false;
   bool _statusSelected = false;
 
@@ -52,21 +51,18 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     _status = task?.status ?? TaskStatus.todo;
     _blockedById = task?.blockedById;
 
-    // Set validation flags for existing task
-    if (_isEditing) {
+     if (_isEditing) {
       _titleValid = _titleCtrl.text.trim().isNotEmpty;
       _dateSelected = true;
       _statusSelected = true;
       _descValid = true;
     }
 
-    // Load draft only for new task creation
-    if (!_isEditing) {
+     if (!_isEditing) {
       Future.microtask(_loadDraft);
     }
 
-    // Listen for changes to persist draft
-    _titleCtrl.addListener(_updateValidation);
+     _titleCtrl.addListener(_updateValidation);
     _descCtrl.addListener(_saveDraft);
   }
 
@@ -135,13 +131,13 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       case 0:
         return _titleValid;
       case 1:
-        return true; // description is optional
+        return true;
       case 2:
         return _dateSelected;
       case 3:
         return _statusSelected;
       case 4:
-        return true; // blocked by is optional
+        return true;
       default:
         return false;
     }
@@ -937,8 +933,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
 
       body: Stack(
         children: [
-          // Background Images - Fixed positions relative to screen
-          Positioned(
+           Positioned(
             top: 40,
             right: 10,
             child: IgnorePointer(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import '../../../core/notification/notification_service.dart';
 import '../models/task.dart';
 import '../providers/task_providers.dart';
 import '../widgets/search_filter_bar.dart';
@@ -25,9 +26,11 @@ class TaskListScreen extends ConsumerWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: isDark ? const Color(0xFF1A1D2E) : const Color(0xFFF5F6FA),
+      backgroundColor:
+      isDark ? const Color(0xFF1A1D2E) : const Color(0xFFF5F6FA),
       appBar: AppBar(
-        backgroundColor: isDark ? const Color(0xFF1A1D2E) : const Color(0xFFF5F6FA),
+        backgroundColor:
+        isDark ? const Color(0xFF1A1D2E) : const Color(0xFFF5F6FA),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Column(
@@ -53,8 +56,9 @@ class TaskListScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // ✅ FIX 1: Theme toggle — sahi jagah rakha, size bounded kiya
           Container(
-            margin: const EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.white.withOpacity(0.08)
@@ -74,12 +78,37 @@ class TaskListScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       isDark ? "🌞" : "🌙",
-                      style: TextStyle(
-                        fontSize: 22,
-                        color: isDark ? Colors.white : const Color(0xFF1A1D2E),
-                      ),
+                      style: const TextStyle(fontSize: 22),
                     ),
                   ),
+                ),
+              ),
+            ),
+          ),
+
+          // ✅ FIX 2: Notification test button — alag rakha, bounded size
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: GestureDetector(
+              onTap: () async {
+                // await NotificationService.showInstant(
+                //   title: '🔔 Test Notification',
+                //   body: 'Notifications are working!',
+                // );
+                await NotificationService.debugTestNotification();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.notifications_outlined,
+                  size: 22,
+                  color: isDark ? Colors.white : const Color(0xFF1A1D2E),
                 ),
               ),
             ),
@@ -106,9 +135,9 @@ class TaskListScreen extends ConsumerWidget {
 
               Expanded(
                 child: filteredAsync.when(
-                  loading: () => Center(
+                  loading: () => const Center(
                     child: CircularProgressIndicator(
-                      color: const Color(0xFF2D5BE3),
+                      color: Color(0xFF2D5BE3),
                     ),
                   ),
                   error: (e, _) => Center(
@@ -155,7 +184,9 @@ class TaskListScreen extends ConsumerWidget {
           'New Task',
           style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
         ),
-      ).animate().scale(delay: 300.ms, duration: 400.ms, curve: Curves.elasticOut),
+      )
+          .animate()
+          .scale(delay: 300.ms, duration: 400.ms, curve: Curves.elasticOut),
     );
   }
 }
@@ -170,20 +201,44 @@ class _StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final total = tasks.length;
     final done = tasks.where((t) => t.status == TaskStatus.done).length;
-    final inProgress = tasks.where((t) => t.status == TaskStatus.inProgress).length;
+    final inProgress =
+        tasks.where((t) => t.status == TaskStatus.inProgress).length;
     final todo = tasks.where((t) => t.status == TaskStatus.todo).length;
 
-    return Row(
-      children: [
-        _StatChip(label: 'Total', count: total, color: const Color(0xFF2D5BE3), isDark: isDark),
-        const Gap(8),
-        _StatChip(label: 'To-Do', count: todo, color: const Color(0xFF8B8FA8), isDark: isDark),
-        const Gap(8),
-        _StatChip(label: 'Active', count: inProgress, color: const Color(0xFFE8A838), isDark: isDark),
-        const Gap(8),
-        _StatChip(label: 'Done', count: done, color: const Color(0xFF34C77B), isDark: isDark),
-      ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        children: [
+          Expanded(
+              child: _StatChip(
+                  label: 'Total',
+                  count: total,
+                  color: const Color(0xFF2D5BE3),
+                  isDark: isDark)),
+          const Gap(8),
+          Expanded(
+              child: _StatChip(
+                  label: 'To-Do',
+                  count: todo,
+                  color: const Color(0xFF8B8FA8),
+                  isDark: isDark)),
+          const Gap(8),
+          Expanded(
+              child: _StatChip(
+                  label: 'Active',
+                  count: inProgress,
+                  color: const Color(0xFFE8A838),
+                  isDark: isDark)),
+          const Gap(8),
+          Expanded(
+              child: _StatChip(
+                  label: 'Done',
+                  count: done,
+                  color: const Color(0xFF34C77B),
+                  isDark: isDark)),
+        ],
+      ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
+    );
   }
 }
 
@@ -202,39 +257,35 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isDark
-              ? color.withOpacity(0.12)
-              : color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.2), width: 1),
-        ),
-        child: Column(
-          children: [
-            Text(
-              '$count',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? color.withOpacity(0.12) : color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$count',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: color,
             ),
-            const Gap(2),
-            Text(
-              label,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
-                color: isDark
-                    ? Colors.white.withOpacity(0.5)
-                    : const Color(0xFF1A1D2E).withOpacity(0.5),
-                fontWeight: FontWeight.w500,
-              ),
+          ),
+          const Gap(2),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              color: isDark
+                  ? Colors.white.withOpacity(0.5)
+                  : const Color(0xFF1A1D2E).withOpacity(0.5),
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

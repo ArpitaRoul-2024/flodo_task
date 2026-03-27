@@ -4,17 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/task.dart';
 import '../repositories/task_repository.dart';
 
-// ─── Repository ───────────────────────────────────────────────────────────────
+
 
 final taskRepositoryProvider = Provider<TaskRepository>((_) => TaskRepository());
 
-// ─── All Tasks (live stream from Hive) ───────────────────────────────────────
 
 final tasksStreamProvider = StreamProvider<List<Task>>((ref) {
   return ref.watch(taskRepositoryProvider).watchAll();
 });
 
-// ─── Search ───────────────────────────────────────────────────────────────────
+
 
 final searchQueryProvider = StateProvider<String>((_) => '');
 final debouncedSearchProvider = StateProvider<String>((_) => '');
@@ -30,21 +29,20 @@ class SearchDebouncer {
 final searchDebouncerProvider =
 Provider<SearchDebouncer>((_) => SearchDebouncer());
 
-// ─── Status Filter ────────────────────────────────────────────────────────────
+
 
 final statusFilterProvider = StateProvider<TaskStatus?>((_) => null);
 
-// ─── Filtered Tasks ───────────────────────────────────────────────────────────
 
-// ─── Filtered Tasks ───────────────────────────────────────────────────────────
+
+
 
 final filteredTasksProvider = Provider<AsyncValue<List<Task>>>((ref) {
   final allAsync = ref.watch(tasksStreamProvider);
   final query = ref.watch(debouncedSearchProvider).trim().toLowerCase();
   final statusFilter = ref.watch(statusFilterProvider);
 
-  // Loading ke waqt empty list dikhao — loader nahi
-  if (allAsync is AsyncLoading) {
+   if (allAsync is AsyncLoading) {
     return const AsyncData([]);
   }
 
@@ -58,7 +56,6 @@ final filteredTasksProvider = Provider<AsyncValue<List<Task>>>((ref) {
     }).toList();
   });
 });
-// ─── Draft Persistence ────────────────────────────────────────────────────────
 
 const _draftTitleKey = 'draft_title';
 const _draftDescKey = 'draft_desc';
@@ -100,6 +97,6 @@ final draftProvider =
 AsyncNotifierProvider<DraftNotifier, ({String title, String description})>(
     DraftNotifier.new);
 
-// ─── Saving State ─────────────────────────────────────────────────────────────
+
 
 final isSavingProvider = StateProvider<bool>((_) => false);

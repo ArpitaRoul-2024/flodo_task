@@ -18,8 +18,7 @@ class SearchFilterBar extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Search Field ───────────────────────────────────────────────
-        Container(
+         Container(
           decoration: BoxDecoration(
             color: isDark
                 ? const Color(0xFF1C1C1C)
@@ -90,7 +89,7 @@ class SearchFilterBar extends ConsumerWidget {
 
         const Gap(14),
 
-        // ── Filter Chips ───────────────────────────────────────────────
+
         SizedBox(
           height: 34,
           child: ListView(
@@ -165,7 +164,7 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ── Colors based on theme ──────────────────────────────────────────
+
     final unselectedBg = isDark
         ? const Color(0xFF1C1C1C)
         : const Color(0xFFF0F0F5);

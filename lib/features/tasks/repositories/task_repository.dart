@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/db/hive_service.dart';
+import '../../../core/notification/notification_service.dart';
 import '../models/task.dart';
 
 class TaskRepository {
@@ -36,14 +37,20 @@ class TaskRepository {
     task.id = const Uuid().v4();
     task.sortOrder = _box.length;
     await _box.put(task.id, task);
+    await NotificationService.scheduleTaskReminder(task);
   }
 
   Future<void> update(Task task) async {
     await Future.delayed(const Duration(seconds: 2));
     await _box.put(task.id, task);
+    await NotificationService.scheduleTaskReminder(task);
   }
 
   Future<void> delete(String id) async {
+    final task = getById(id);
+    if (task != null) {
+      await NotificationService.cancelTaskReminder(task);
+    }
     await _box.delete(id);
   }
 
@@ -52,5 +59,10 @@ class TaskRepository {
     if (task == null) return;
     task.status = status;
     await _box.put(id, task);
+    if (status == TaskStatus.done) {
+      await NotificationService.cancelTaskReminder(task);
+    } else {
+      await NotificationService.scheduleTaskReminder(task);
+    }
   }
 }

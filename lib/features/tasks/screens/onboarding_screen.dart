@@ -34,8 +34,7 @@ class OnboardingScreen extends StatelessWidget {
 
                 const Spacer(flex: 1),
 
-                // ── Title ─────────────────────────────────────────────
-                Text(
+                 Text(
                   'Smart Task\nManagement',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 36,
@@ -47,7 +46,7 @@ class OnboardingScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // ── Subtitle ──────────────────────────────────────────
+
                 Text(
                   'This smart tool is designed to help you\nbetter manage your tasks',
                   style: GoogleFonts.plusJakartaSans(
@@ -59,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
 
                 const Spacer(flex: 2),
 
-                // ── Continue Button ───────────────────────────────────
+
                 SizedBox(
                   width: double.infinity,
                   height: 56,
